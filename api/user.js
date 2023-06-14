@@ -3,7 +3,7 @@ const { Router } = require('express')
 
 const {ValidationError} = require('sequelize')
 const {userInfo,UserClientFields} = require('../models/user')
-const { generateAuthToken, hashAndSaltPassword, validateUser} = require('../lib/auth')
+const { generateAuthToken, hashAndSaltPassword, validateUser, requireAuthentication} = require('../lib/auth')
 
 /*
 * Route to create a new user.
@@ -45,4 +45,31 @@ router.post('/login', async (req, res) => {
 });
 
 
+app.get('/:id', requireAuthentication, async (req, res) => {
+  const id = req.params.id;
+  const user = await User.findByPk(id);
 
+  if (user) {
+    const courses = [];
+    if (user.role === 'instructor') {
+      courses = await Course.findAll({
+        where: {
+          instructorId: id
+        },
+        attributes: ['id']
+      });
+    } else if (user.role === 'student') {
+      courses = await user.getCourses({
+        attributes: ['id']
+      });
+    }
+    res.status(200).json({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      courses: courses.map(course => course.id)
+    });
+  } else {
+    res.status(404).json({ error: `User with id: ${id} not found` });
+  }
+});
