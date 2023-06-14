@@ -41,3 +41,20 @@ router.get('/', async function(req, res) {
     links: links
   })
 });
+
+/*
+ * Route to create a new Course.
+ */
+
+router.post('/', async function (req, res) {
+  try {
+    const course = await Course.create(req.body, CourseClientFields)
+    res.status(201).send({ id: id })
+  } catch (e) {
+    if (e instanceof ValidationError) {
+      res.status(400).send({ error: e.message })
+    } else {
+      throw e
+    }
+  }
+});
