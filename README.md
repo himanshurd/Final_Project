@@ -1,4 +1,4 @@
-# CS_493 Final Project
+# CS 493 Final Project
 
 In this course, a final programming project will take the place of formal exams to test your understanding of the material. The final project will involve working with a team of 3-4 people to implement a complete RESTful API for an application called Tarpaulin.
 
