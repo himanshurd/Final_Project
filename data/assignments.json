@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "courseId": 101,
+    "title": "Homework 1",
+    "points": 10,
+    "due": "2022-06-20T10:00:00-07:00"
+  },
+  {
+    "id": 2,
+    "courseId": 102,
+    "title": "Lab Exercise 1",
+    "points": 15,
+    "due": "2022-06-22T14:30:00-07:00"
+  },
+  {
+    "id": 3,
+    "courseId": 103,
+    "title": "Project Proposal",
+    "points": 20,
+    "due": "2022-06-25T18:00:00-07:00"
+  },
+  {
+    "id": 4,
+    "courseId": 101,
+    "title": "Homework 2",
+    "points": 12,
+    "due": "2022-06-27T12:00:00-07:00"
+  },
+  {
+    "id": 5,
+    "courseId": 102,
+    "title": "Lab Exercise 2",
+    "points": 18,
+    "due": "2022-06-29T16:45:00-07:00"
+  },
+  {
+    "id": 6,
+    "courseId": 104,
+    "title": "Midterm Exam",
+    "points": 50,
+    "due": "2022-07-05T09:30:00-07:00"
+  },
+  {
+    "id": 7,
+    "courseId": 101,
+    "title": "Homework 3",
+    "points": 8,
+    "due": "2022-07-07T11:15:00-07:00"
+  },
+  {
+    "id": 8,
+    "courseId": 103,
+    "title": "Final Project",
+    "points": 80,
+    "due": "2022-07-15T13:45:00-07:00"
+  },
+  {
+    "id": 9,
+    "courseId": 102,
+    "title": "Lab Exercise 3",
+    "points": 14,
+    "due": "2022-07-18T16:30:00-07:00"
+  },
+  {
+    "id": 10,
+    "courseId": 104,
+    "title": "Final Exam",
+    "points": 100,
+    "due": "2022-07-20T10:30:00-07:00"
+  }
+]
