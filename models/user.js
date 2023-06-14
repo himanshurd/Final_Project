@@ -14,6 +14,12 @@ const userInfo = sequelize.define('user', {
 
 exports.User = User
 
+/*
+* one-to-many relationship between User and Submission.
+*/
+User.hasMany(Submission, { foreignKey: 'studentId' })
+Submission.belongsTo(userInfo)
+
 exports.UserClientFields = [
     'id',
     'name',
