@@ -1,0 +1,72 @@
+[
+  {
+    "id": 7,
+    "name": "Emily Davis",
+    "email": "emilydavis12@gmail.com",
+    "password": "pass",
+    "role": "student"
+  },
+  {
+    "id": 6,
+    "name": "Sarah Thompson",
+    "email": "sarahthgompson89@gmail.com",
+    "password": "pass",
+    "role": "student"
+  },
+  {
+    "id": 8,
+    "name": "Michael Miller",
+    "email": "michaelmiller3@gmail.com",
+    "password": "pass",
+    "role": "student"
+  },
+  {
+    "id": 9,
+    "name": "Olivia Wilson",
+    "email": "oliviawilson5@gmail.com",
+    "password": "pass",
+    "role": "student"
+  },
+  {
+    "id": 4,
+    "name": "Ian Wilson",
+    "email": "ianwilson@gmail.com",
+    "password": "pass",
+    "role": "instructor"
+  },
+  {
+    "id": 2,
+    "name": "Jane Smith",
+    "email": "janesmith@gmail.com",
+    "password": "pass",
+    "role": "instructor"
+  },
+  {
+    "id": 1,
+    "name": "John Doe",
+    "email": "johndoe@gmail.com",
+    "password": "pass",
+    "role": "admin"
+  },
+	{
+    "id": 1,
+    "name": "Puffey Smith",
+    "email": "puffeysmith@gmail.com",
+    "password": "pass",
+    "role": "admin"
+  },
+  {
+    "id": 3,
+    "name": "Samuel Johnson",
+    "email": "samjohnson@gmail.com",
+    "password": "pass",
+    "role": "instructor"
+  },
+  {
+    "id": 5,
+    "name": "Jonathan Brown",
+    "email": "jonathanbrown@gmail.com",
+    "password": "pass",
+    "role": "instructor"
+  }
+]
