@@ -12,6 +12,12 @@ const Assignment = sequelize.define('assignment', {
 }) 
 exports.Assignment = Assignment
 
+/*
+* one-to-many relationship between Assignemnts and Submissions
+*/
+Assignment.hasMany(Submission, { foreignKey: 'assignmentId' })
+Submission.belongsTo(Assignment)
+
 exports.AssignmentClientFields = [
     'id',
     'courseId',
