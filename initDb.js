@@ -4,19 +4,14 @@
  */
 
 const sequelize = require('./lib/sequelize')
-const { Business, BusinessClientFields } = require('./models/business')
-const { Photo, PhotoClientFields } = require('./models/photo')
-const { Review, ReviewClientFields } = require('./models/review')
-const { User, UserClientFields } = require('./models/user')
-
-const businessData = require('./data/businesses.json')
-const photoData = require('./data/photos.json')
-const reviewData = require('./data/reviews.json')
+const courseData = require('./data/courses.json')
 const userData = require('./data/users.json')
+const { Course, CourseClientFields } = require('./models/course')
+const { User, UserClientFields } = require('./models/user')
+const { Assignment, AssignmentClientFields } = require('./models/assignment')
+const { Submission, SubmissionClientFields } = require('./models/submission')
 
 sequelize.sync().then(async function () {
-  await Business.bulkCreate(businessData, { fields: BusinessClientFields })
-  await Photo.bulkCreate(photoData, { fields: PhotoClientFields })
-  await Review.bulkCreate(reviewData, { fields: ReviewClientFields })
   await User.bulkCreate(userData, { fields: UserClientFields })
+  await Course.bulkCreate(courseData, { fields: CourseClientFields })
 })
