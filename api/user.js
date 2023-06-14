@@ -44,7 +44,9 @@ router.post('/login', async (req, res) => {
     }
 });
 
-
+/*
+ * Route to get a user by id
+ */
 app.get('/:id', requireAuthentication, async (req, res) => {
   const id = req.params.id;
   const user = await User.findByPk(id);
