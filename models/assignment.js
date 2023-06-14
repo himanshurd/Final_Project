@@ -12,7 +12,7 @@ const Assignment = sequelize.define('assignment', {
 }) 
 exports.Assignment = Assignment
 
-exports.UserClientFields = [
+exports.AssignmentClientFields = [
     'id',
     'courseId',
     'title',
