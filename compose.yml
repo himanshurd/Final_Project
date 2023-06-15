@@ -1,4 +1,3 @@
-version: '3'
 services:
   db:
     image: mysql
@@ -9,9 +8,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
   db-init:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     environment:
       MYSQL_HOST: db
       MYSQL_USER: ${MYSQL_USER}
@@ -23,9 +20,7 @@ services:
     command: npm run initdb
 
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     ports:
       - 8000:8000
     environment:

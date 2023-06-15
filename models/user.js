@@ -15,7 +15,7 @@ exports.userInfo = userInfo;
 /*
  * One-to-many relationship between User and Submission.
  */
-userInfo.hasMany(Submission, { foreignKey: 'studentId' });
+userInfo.hasMany(Submission, { foreignKey: 'userId' });
 Submission.belongsTo(userInfo); 
 
 exports.UserClientFields = [
