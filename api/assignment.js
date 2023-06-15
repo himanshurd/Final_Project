@@ -1,10 +1,30 @@
+var express = require('express');
+var router = express.Router();
 
-const { Router } = require('express')
-const {AssignmentClientFields } = require('../models/business')
+const {Assignment, AssignmentClientFields } = require('../models/assignment')
+
+const crypto = require("node:crypto")
+var fs = require('fs');
 
 const { ValidationError } = require('sequelize')
 const { Course } = require('../models/course')
 const { userInfo } = require('../models/user')
+const { Submission, SubmissionClientFields, file } = require('../models/submission')
+const { requireAuthentication } = require('../lib/auth')
+
+const upload = multer({
+    storage: multer.diskStorage({
+      destination: `${__dirname}/../uploads`,
+      filename: (req, file, callback) => {
+          const filename = crypto.pseudoRandomBytes(16).toString("hex")
+          const extension = file[file.type]
+          callback(null, `${filename}.${extension}`)
+      }
+    }),
+    fileFilter: (req, file, callback) => {
+      callback(null, !!file[file.type]);
+    }
+  });
 /*
  * Route to create a new assignment.
  */
@@ -69,3 +89,21 @@ router.delete('/:id', async function (req, res) {
     }
     
 })
+
+/*
+ *  Route to get a uploaded submitted file
+ */
+router.get('/submissions/:id/download', requireAuthentication, async function (req, res) {
+  const submissionId = req.params.id
+  try{
+    const submission = await Submission.findByPk(submissionId)
+    if(!submission){
+      res.status(400).send("Submission is not existed for this id")
+    }
+    filestream.pipe(res);
+  } catch {
+    res.status(400).send("error downloading file.")
+  }  
+})
+
+

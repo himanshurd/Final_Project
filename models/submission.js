@@ -1,6 +1,5 @@
-const sequelize = require('../lib/sequelize')
-
 const { DataTypes } = require('sequelize')
+const sequelize = require('../lib/sequelize')
 
 const Submission = sequelize.define('submissions', {
     id: { type: DataTypes.INTEGER, allowNull: false, autoIncrement: true, primaryKey: true },
