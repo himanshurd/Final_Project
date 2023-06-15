@@ -18,5 +18,22 @@ router.post('/', async function (req, res, next) {
         throw e
       }
     }
-  })
+})
+
+/*
+ * Route to fetch info about a specific Assignment.
+ */
+router.get('/:id', async function (req, res) {
+    const assignmentId = req.params.id
+    const assignment = await Business.findByPk(assignmentId, {
+    })
+    if (assignment) {
+      res.status(200).send(assignment)
+    } else {
+      res.status(404).json({"status": "Error 404 Assignment not found"})
+    }
+})
+
+
+  
 
