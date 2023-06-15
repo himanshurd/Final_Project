@@ -135,6 +135,30 @@ router.get('/:id/submissions', requireAuthentication, async (req, res) => {
   }
 });
 
+/*
+ * Route to create a new submission.
+ */
+router.post('/:id/submissions', requireAuthentication, upload.single('file'), async (req, res, next) => {
+  const submissionId = req.param.id;
+  const fileType = req.file.type;
+  try {
+    const submission = await Submission.create({
+      'assignmentId': submissionId,
+      'studentId': 2,
+      'grade': 40,
+      'file': fileType
+    }, SubmissionClientFields);
+
+    res.status(201).send({ id: submission.id });
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      res.status(400).send({ error: error.message });
+    } else {
+      throw error;
+    }
+  }
+});
+
 
 
 
