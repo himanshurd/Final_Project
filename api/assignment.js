@@ -34,6 +34,23 @@ router.get('/:id', async function (req, res) {
     }
 })
 
-
+/*
+ *  Update data for a specific Assignment.
+ */
+router.patch('/:id', async function (req, res) {
+    const assignmentId = req.params.id
+    try {  
+      const result = await Assignment.update(req.body, {
+      where: { id: assignmentId },
+      fields: AssignmentClientFields
+      })
+      if (result[0] > 0) {
+        res.status(200).json({"status": "okay"})
+      } 
+    } catch (err) {
+      res.status(500).send(err)
+    }
+  
+  })
   
 
