@@ -3,7 +3,8 @@ const { Router } = require('express')
 const {AssignmentClientFields } = require('../models/business')
 
 const { ValidationError } = require('sequelize')
-
+const { Course } = require('../models/course')
+const { userInfo } = require('../models/user')
 /*
  * Route to create a new assignment.
  */
