@@ -1,5 +1,6 @@
 //Himanshu Dhir
 const { Router } = require('express')
+const router = Router();
 
 const {ValidationError} = require('sequelize')
 const {userInfo,UserClientFields} = require('../models/user')
