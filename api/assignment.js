@@ -51,6 +51,20 @@ router.patch('/:id', async function (req, res) {
       res.status(500).send(err)
     }
   
-  })
+})
   
-
+/*
+ *  Route to delete a specific Assignment.
+ */
+router.delete('/:id', async function (req, res) {
+    const assignmentId = req.params.id
+    try {
+      const result = await Assignment.destroy({ where: { id: assignmentId }})
+      if (result > 0) {
+        res.status(204).send()
+      } 
+    } catch (err) {
+      res.status(500).send(err)
+    }
+    
+})
