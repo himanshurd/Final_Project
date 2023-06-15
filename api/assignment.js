@@ -106,4 +106,35 @@ router.get('/submissions/:id/download', requireAuthentication, async function (r
   }  
 })
 
+/*
+ *  Route to return a list of submissions per assignment.
+ */
+router.get('/:id/submissions', requireAuthentication, async (req, res) => {
+  const submissionId = req.params.id;
+
+  try {
+    const assignment = await Assignment.findByPk(submissionId);
+    const course = await Course.findByPk(assignment.courseId);
+    const instructor = await User.findByPk(course.instructorId);
+
+    if (req.role === 'admin' || req.user === instructor.id) {
+      let page = parseInt(req.query.page) || 1;
+      page = page < 1 ? 1 : page;
+      const num_per_page = 5;
+
+      const result = await Submission.findAndCountAll({
+        limit: num_per_page,
+        offset: (page - 1) * num_per_page
+      });
+    } else {
+      res.status(403).json({ error: 'Access denied' });
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+
 
