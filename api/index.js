@@ -1,6 +1,5 @@
-// const router = require('express').Router();
-const { Router } = require('express');
-const router = Router();
+const express = require('express');
+const router = express.Router();
 
 router.use('/users', require('./user'));
 router.use('/courses', require('./course'));
@@ -11,3 +10,4 @@ router.get('/', function(req, res, next) {
 });
 
 module.exports = router;
+

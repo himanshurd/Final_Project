@@ -1,14 +1,14 @@
 var express = require('express');
 var router = express.Router();
+const multer = require('multer');
 
 const {Assignment, AssignmentClientFields } = require('../models/assignment')
 
 const crypto = require("node:crypto")
 var fs = require('fs');
-
 const { ValidationError } = require('sequelize')
 const { Course } = require('../models/course')
-const { userInfo } = require('../models/user')
+const { User } = require('../models/user')
 const { Submission, SubmissionClientFields, file } = require('../models/submission')
 const { requireAuthentication } = require('../lib/auth')
 

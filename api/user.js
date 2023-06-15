@@ -1,20 +1,18 @@
 const { Router } = require('express');
-
 const router = Router();
-
 const { ValidationError } = require('sequelize');
 const { User, UserClientFields } = require('../models/user');
 const { generateAuthToken, hashAndSaltPassword, validateUser, requireAuthentication } = require('../lib/auth');
 
 /*
-* Route to create a new user.
-*/
+ * Route to create a new user.
+ */
 router.post('/', async (req, res) => {
   try {
-    const user = await User.create(req.body, UserClientFields);
+    const password = req.body.password;
+    const hashedPassword = await hashAndSaltPassword(password);
+    const user = await User.create({ ...req.body, password: hashedPassword }, UserClientFields);
     res.status(201).send({ id: user.id });
-    const Password = await hashAndSaltPassword(req.body.password);
-    req.body.password = Password;
   } catch (e) {
     if (e instanceof ValidationError) {
       res.status(400).send({ error: e.message });
@@ -25,7 +23,7 @@ router.post('/', async (req, res) => {
 });
 
 /*
- * Route to login a registered user
+ * Route to login a registered user.
  */
 router.post('/login', async (req, res) => {
   if (req.body && req.body.email && req.body.password) {
@@ -38,22 +36,22 @@ router.post('/login', async (req, res) => {
         res.status(401).send({ error: "Access denied. Invalid Username or Password." });
       }
     } catch (err) {
-      res.status(500).send({ error: "server error. Please try again later." });
+      res.status(500).send({ error: "Server error. Please try again later." });
     }
   } else {
-    res.status(400).send({ error: "request is not valid. Please provide correct email and password." });
+    res.status(400).send({ error: "Request is not valid. Please provide correct email and password." });
   }
 });
 
 /*
- * Route to get a user by id
+ * Route to get a user by id.
  */
 router.get('/:id', requireAuthentication, async (req, res) => {
   const id = req.params.id;
   const user = await User.findByPk(id);
 
   if (user) {
-    const courses = [];
+    let courses = [];
     if (user.role === 'instructor') {
       courses = await Course.findAll({
         where: {

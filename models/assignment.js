@@ -1,6 +1,6 @@
 
 const { DataTypes } = require('sequelize');
-const {submission} = require('./submission')
+const {Submission} = require('./submission')
 const sequelize = require('../lib/sequelize');
 
 const Assignment = sequelize.define('assignment', {

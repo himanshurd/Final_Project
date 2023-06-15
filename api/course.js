@@ -1,52 +1,50 @@
-var express = require('express');
-var router = express.Router();
-
-const crypto = require("node:crypto")
-var fs = require('fs');
-const { ValidationError } = require('sequelize')
-const { Assignment, AssignmentClientFields } = require('../models/assignment')
-const { requireAuthentication } = require('../lib/auth')
-const { Submission, SubmissionClientFields, fileTypes } = require('../models/submission')
-const { Course } = require('../models/course')
-const { User } = require('../models/user')
-
+const express = require('express');
+const router = express.Router();
+const crypto = require("crypto");
+const fs = require('fs');
+const { ValidationError } = require('sequelize');
+const { Assignment, AssignmentClientFields } = require('../models/assignment');
+const { requireAuthentication } = require('../lib/auth');
+const { Submission, SubmissionClientFields, fileTypes } = require('../models/submission');
+const { Course } = require('../models/course');
+const { User } = require('../models/user');
 const multer = require('multer');
+
 const upload = multer({
   storage: multer.diskStorage({
     destination: `${__dirname}/../uploads`,
     filename: (req, file, callback) => {
-        const filename = crypto.pseudoRandomBytes(16).toString("hex")
-        const extension = fileTypes[file.mimetype]
-        callback(null, `${filename}.${extension}`)
+        const filename = crypto.pseudoRandomBytes(16).toString("hex");
+        const extension = fileTypes[file.mimetype];
+        callback(null, `${filename}.${extension}`);
     }
   }),
   fileFilter: (req, file, callback) => {
     callback(null, !!fileTypes[file.mimetype]);
   }
 });
-module.exports = router;
 
 /*
  * Route to create a new assignment.
  */
 router.post('/', requireAuthentication, async function (req, res, next) {
   try {
-    const assignment = await Assignment.create(req.body, AssignmentClientFields)
-    const course = await Course.findByPk(assignment.courseId)
-    const instructor = await User.findByPk(course.instructorId)
-    if(req.role == 'admin' || req.user == instructor.id) {
-      res.status(201).send({ id: assignment.id })
+    const assignment = await Assignment.create(req.body, AssignmentClientFields);
+    const course = await Course.findByPk(assignment.courseId);
+    const instructor = await User.findByPk(course.instructorId);
+    if (req.role === 'admin' || req.user === instructor.id) {
+      res.status(201).send({ id: assignment.id });
     } else {
-      res.status(403).send("The request was not made by an authenticated User")
+      res.status(403).send("The request was not made by an authenticated User");
     }
   } catch (e) {
     if (e instanceof ValidationError) {
-      res.status(400).send({ error: e.message })
+      res.status(400).send({ error: e.message });
     } else {
-      throw e
+      throw e;
     }
   }
-})
+});
 
 /*
  *  Fetch data about a specific Assignment.
@@ -191,3 +189,5 @@ router.post('/:id/submissions', requireAuthentication, upload.single('file'), as
     }
   }
 })
+
+module.exports = router;
