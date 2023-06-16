@@ -1,186 +1,50 @@
-const express = require('express');
-const router = express.Router();
-const crypto = require("crypto");
-const fs = require('fs');
+const router = require('express').Router();
 const { ValidationError } = require('sequelize');
-const { Assignment, AssignmentClientFields } = require('../models/assignment');
-const { requireAuthentication } = require('../lib/auth');
-const { Submission, SubmissionClientFields, fileTypes } = require('../models/submission');
-const { Course } = require('../models/course');
+const { Course, CourseUsers, CourseClientFields } = require('../models/course');
 const { User } = require('../models/user');
-const multer = require('multer');
+const { Assignment } = require('../models/assignment');
+const { requireAuthentication } = require("../lib/auth");
 
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: `${__dirname}/../uploads`,
-    filename: (req, file, callback) => {
-        const filename = crypto.pseudoRandomBytes(16).toString("hex");
-        const extension = fileTypes[file.mimetype];
-        callback(null, `${filename}.${extension}`);
-    }
-  }),
-  fileFilter: (req, file, callback) => {
-    callback(null, !!fileTypes[file.mimetype]);
+/* 
+ * Route to return a list of all Courses.
+ */ 
+router.get('/', async function(req, res) {
+  let page = parseInt(req.query.page) || 1
+  page = page < 1 ? 1 : page
+  const numPerPage = 10
+  const offset = (page - 1) * numPerPage
+
+  const result = await Course.findAndCountAll({
+    limit: numPerPage,
+    offset: offset
+  })
+  const lastPage = Math.ceil(result.count / numPerPage)
+  const links = {}
+  if (page < lastPage) {
+    links.nextPage = `/courses?page=${page + 1}`
+    links.lastPage = `/courses?page=${lastPage}`
   }
+  if (page > 1) {
+    links.prevPage = `/courses?page=${page - 1}`
+    links.firstPage = '/courses?page=1'
+  }
+  res.status(200).json({
+    courses: result.rows,
+    pageNumber: page,
+    totalPages: lastPage,
+    pageSize: numPerPage,
+    totalCount: result.count,
+    links: links
+  })
 });
 
 /*
- * Route to create a new assignment.
+ * Route to create a new Course.
  */
-router.post('/', requireAuthentication, async function (req, res, next) {
+router.post('/', requireAuthentication, async function (req, res) {
   try {
-    const assignment = await Assignment.create(req.body, AssignmentClientFields);
-    const course = await Course.findByPk(assignment.courseId);
-    const instructor = await User.findByPk(course.instructorId);
-    if (req.role === 'admin' || req.user === instructor.id) {
-      res.status(201).send({ id: assignment.id });
-    } else {
-      res.status(403).send("The request was not made by an authenticated User");
-    }
-  } catch (e) {
-    if (e instanceof ValidationError) {
-      res.status(400).send({ error: e.message });
-    } else {
-      throw e;
-    }
-  }
-});
-
-/*
- *  Fetch data about a specific Assignment.
- */
-router.get('/:id', async function (req, res) {
-  const assignment = await Assignment.findByPk(req.params.id)
-  if (assignment) {
-    res.status(200).send(assignment)
-  } else {
-    res.status(404).json({"status": "not found"})
-  }
-
-})
-
-/*
- *  Update data for a specific Assignment.
- */
-router.patch('/:id', async function (req, res) {
-  const assignmentId = req.params.id
-  try {  
-    const result = await Assignment.update(req.body, {
-    where: { id: assignmentId },
-    fields: AssignmentClientFields
-    })
-    if (result[0] > 0) {
-      res.status(200).json({"status": "okay"})
-    } else {
-      res.status(500).send("status error")
-    }
-  } catch (err) {
-    res.status(500).send(err)
-  }
-
-})
-
-/*
- *  Remove a specific Assignment from the database.
- */
-router.delete('/:id', async function (req, res) {
-  const assignmentId = req.params.id
-  try {
-    const result = await Assignment.destroy({ where: { id: assignmentId }})
-    if (result > 0) {
-      res.status(204).send()
-    } else {
-      res.status(500).send("status error")
-    }
-  } catch (err) {
-    res.status(500).send(err)
-  }
-  
-})
-
-router.get('/submissions/:id/download', requireAuthentication, async function (req, res) {
-  try{
-    const submission = await Submission.findByPk(req.params.id)
-    if(!submission){
-      res.status(400).send("cannot find submission with that id")
-    }
-    var file = submission.filePath;
-    var filename = file.split('.');
-    var mimetype = submission.fileType;
-  
-    res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-    res.setHeader('Content-type', mimetype);
-  
-    var filestream = fs.createReadStream(file);
-    filestream.pipe(res);
-  } catch {
-    res.status(400).send("error downloading file.")
-  }  
-})
-
-/*
- * Route to return a list of submissions for an assignment.
- */
-router.get('/:id/submissions', requireAuthentication, async function (req, res) {
-  const id = req.params.id
-  try{ 
-    const assignment = await Assignment.findByPk(id)
-    const course = await Course.findByPk(assignment.courseId)
-    const instructor = await User.findByPk(course.instructorId)
-    if (req.role == 'admin' || req.user == instructor.id){
-      let page = parseInt(req.query.page) || 1
-      page = page < 1 ? 1 : page
-      const numPerPage = 10
-      const offset = (page - 1) * numPerPage
-    
-      const result = await Submission.findAndCountAll({
-        limit: numPerPage,
-        offset: offset
-      })
-      const lastPage = Math.ceil(result.count / numPerPage)
-      const links = {}
-      if (page < lastPage) {
-        links.lastPage = `/assignments/${id}/submissions?page=${lastPage}`
-        links.nextPage = `/assignments/${id}/submissions?page=${page + 1}`
-      } else if (page > 1) {
-        links.prevPage = `/assignments/${id}/submissions?page=${page - 1}`
-        links.firstPage = `/assignments/${id}/submissions?page=1`
-      } else {
-        links.firstPage = `/assignments/${id}/submissions?page=1`
-      }
-      for (const subIndex in result.rows) {
-        result.rows[subIndex].dataValues.downloadLink = `/assignments/submissions/${result.rows[subIndex].id}/download`
-      }
-      
-      res.status(200).json({
-        submissions: result.rows,
-        pageNumber: page,
-        totalPages: lastPage,
-        pageSize: numPerPage,
-        totalCount: result.count,
-        links: links
-      })
-    } else {
-      res.status(403).send("The request was not made by an authenticated User")
-    } 
-  } catch {
-    res.status(404).send(`Specified Assignment with id: ${id} not found`)
-  }
-})
-
-/*
- * Route to create a new submission.
- */
-router.post('/:id/submissions', requireAuthentication, upload.single('file'), async function (req, res, next) {
-  try {
-    const submission = await Submission.create({
-      'assignmentId': req.params.id,
-      'studentId': 7,
-      'grade': -1,
-      'filePath': req.file.path,
-      'fileType': req.file.mimetype
-    }, SubmissionClientFields)
-    res.status(201).send({ id: submission.id })
+    const course = await Course.create(req.body, CourseClientFields)
+    res.status(201).send({ id: course.id })
   } catch (e) {
     if (e instanceof ValidationError) {
       res.status(400).send({ error: e.message })
@@ -188,7 +52,131 @@ router.post('/:id/submissions', requireAuthentication, upload.single('file'), as
       throw e
     }
   }
-})
+});
+
+/*
+ * Route to fetch data about a specific course.
+ */
+router.get('/:id', async function (req, res, next) {
+  const id = req.params.id
+  const course = await Course.findByPk(id)
+  if (course) {
+    res.status(200).send(course)
+  } else {
+    next()
+  }
+});
+
+/*
+ * Route to update data for a specific course.
+ */
+router.patch('/:id', requireAuthentication, async function (req, res, next) {
+  if (req.role == 'admin' || req.user == instructor.id) {
+    const id = req.params.id
+    const result = await Course.update(req.body, {
+      where: { id: id },
+      fields: CourseClientFields
+    })
+    if (result[0] > 0) {
+      res.status(200).send()
+    } else {
+      next()
+    }
+  }
+});
+
+/*
+ * Route to remove a specific Course from the database.
+ */
+router.delete('/:id', requireAuthentication, async function (req, res, next) {
+  const id = req.params.id
+  const result = await Course.destroy({ where: { id: id }})
+  if (req.role !== 'admin') {
+    res.status(403).json({
+      error: "Unauthorized to access the specified resource"
+    });
+  } else {
+    if (result > 0) {
+      res.status(204).send()
+    } else {
+      next()
+    }
+  }
+});
+
+/*
+ * Route to fetch a list of the students enrolled in the Course.
+ */
+router.get('/:id/students', requireAuthentication, async function (req, res) {
+  const course = await Course.findByPk(req.params.id)
+  if (!course.instructorId) {
+    res.status(404).send("specified course not found")
+  }
+  const instructor = await User.findByPk(course.instructorId)
+  if (req.role == 'admin' || req.user == instructor.id) {
+    const courseId = req.params.id
+    const courseStudents = await CourseUsers.findAll({ where: {courseId: courseId}})
+    
+    const studentList = await Promise.all(courseStudents.map(async (student) => {
+      const user = await User.findByPk(student.userId)
+      return await user.name
+    }))
+    res.status(200).json({
+      students: studentList
+    })
+  } else {
+    res.status(403).send("request made by unauthorized user")
+  }
+});
+
+/*
+ * Route to update enrollment for a Course.
+ */
+router.post('/:id/students', requireAuthentication, async function (req, res) {
+  const course = await Course.findByPk(req.params.id)
+  if (!course.instructorId) {
+    res.status(404).send("specified course not found")
+  }
+  try {
+    const instructor = await User.findByPk(course.instructorId)
+    if (req.role == 'admin' || req.user == instructor.id) {
+      req.body.add.map(async (userId) => {
+        CourseUsers.create({userId: userId, courseId: req.params.id})
+      });
+      req.body.remove.map(async (userId) => {
+        CourseUsers.destroy({ where: {userId: userId, courseId: req.params.id} })
+      });
+      res.status(200).send({ added: req.body.add, removed: req.body.remove, courseId: req.params.id })
+    } else {
+      res.status(403).send("request made by unauthorized user")
+    }
+  } catch (e) {
+    res.status(400).send( "The request body was either not present or did not contain the fields required")
+  }
+});
+
+/*
+ * Route to fetch a CSV file containing list of the students enrolled in the Course.
+ */
+router.get('/:id/roster', async function (req, res) {
+  if (req.role == 'admin' || req.user == instructor.id) {
+    const courseId = req.params.id
+    const courseRoster = await Course.findAll({ where: {courseId: courseId}})
+    res.status(200).json({
+      roster: courseRoster
+    })
+  }
+});
+
+/*
+ * Route to fetch a list of the Assignments for the Course.
+ */
+router.get('/:id/assignments', async function (req, res) {
+  const courseId = req.params.id
+  const courseAssignments = await Assignment.findAll({ where: {courseId: courseId}})
+  res.status(200).json({
+    results: courseAssignments
+  })
+});
 
 module.exports = router;
-
