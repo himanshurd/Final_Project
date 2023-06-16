@@ -208,3 +208,4 @@ router.post('/:id/submissions', requireAuthentication, upload.single('file'), as
     }
   }
 })
+module.exports = router;
