@@ -2,14 +2,14 @@ const express = require('express');
 const morgan = require('morgan');
 const api = require('./api');
 const sequelize = require('./lib/sequelize');
-
+var { redisClient, rateLimit } = require('./lib/redis')
 const app = express();
 const port = process.env.PORT || 8000;
 
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.static('public'));
-
+app.use(rateLimit)
 app.use('/api', api);
 
 app.use('*', function (req, res, next) {
@@ -30,3 +30,7 @@ sequelize.sync().then(function () {
     console.log("== Server is listening on port:", port);
   });
 });
+
+redisClient.connect().then(function () {
+  app.listen(6000);
+})
