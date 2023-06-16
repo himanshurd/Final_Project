@@ -15,11 +15,12 @@ async function initializeDatabase() {
     await sequelize.sync()
     await User.bulkCreate(userData, { fields: UserClientFields })
     await Course.bulkCreate(courseData, { fields: CourseClientFields })
-
     console.log('Database initialization completed successfully.')
-  } catch (error) {
+  } 
+  catch (error) {
     console.error('Error occurred during database initialization:', error)
-  } finally {
+  } 
+  finally {
     sequelize.close()
   }
 }
