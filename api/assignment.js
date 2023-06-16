@@ -54,7 +54,7 @@ router.post('/', requireAuthentication, async function (req, res, next) {
  */
 router.get('/:id', async function (req, res) {
     const assignmentId = req.params.id
-    const assignment = await Business.findByPk(assignmentId, {
+    const assignment = await Assignment.findByPk(assignmentId, {
     })
     if (assignment) {
       res.status(200).send(assignment)
