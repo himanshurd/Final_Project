@@ -7,4 +7,17 @@ The application for which you’ll write an API for this project is Tarpaulin, a
 
 The Tarpaulin API you implement must support all of the endpoints described in the Tarpaulin OpenAPI specification. Importantly, you are free to implement the endpoints described in the OpenAPI specification however you see fit. For example, you may use whatever database you want, and you may design your API architecture to meet your own needs.
 #
+
+# Evaluation
+By Himanshu Dhir:
+https://docs.google.com/document/d/1c5-0ZmVEmbZxdumC8j2aFbrry2K81b4ceQB9v9OusdI/edit?usp=sharing
+
+By Kunal Jhatta:
+https://docs.google.com/document/d/1_eWBES2ZG_Td8nXr8uBzuCeOxQ4e1ZvqeiVNtrp14rw/edit?usp=sharing
+#
+
+# Presentation
+
+
+
 By Himanshu Dhir, Kunal Jhatta
