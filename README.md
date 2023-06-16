@@ -18,7 +18,7 @@ https://docs.google.com/document/d/1_eWBES2ZG_Td8nXr8uBzuCeOxQ4e1ZvqeiVNtrp14rw/
 
 # Presentation google drive link
 
-https://drive.google.com/file/d/1nmgl2ThyTPyIx_EoiQHrbSL-F9SP9eRe/view?usp=drive_link 
+https://drive.google.com/file/d/1nmgl2ThyTPyIx_EoiQHrbSL-F9SP9eRe/view?usp=sharing
 
 
 
